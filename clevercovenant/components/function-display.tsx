@@ -8,9 +8,13 @@ import {
 } from "@/lib/abi-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { FunctionInteraction } from "./function-interaction";
 
 interface FunctionDisplayProps {
   func: AbiFunction;
+  mode?: "parse" | "interact";
+  contractAddress?: string;
 }
 
 const getStateMutabilityLabel = (stateMutability?: string): string => {
@@ -43,10 +47,19 @@ const getFunctionTypeLabel = (type: string): string => {
   }
 };
 
-export function FunctionDisplay({ func }: FunctionDisplayProps) {
+export function FunctionDisplay({
+  func,
+  mode = "parse",
+  contractAddress,
+}: FunctionDisplayProps) {
   const functionId = `function-${func.name || func.type}-${Math.random()
     .toString(36)
     .substr(2, 9)}`;
+
+  const handleInteract = () => {
+    // TODO: Implement contract interaction
+    console.log(`Interacting with ${func.name} at ${contractAddress}`);
+  };
 
   return (
     <Card
@@ -171,6 +184,13 @@ export function FunctionDisplay({ func }: FunctionDisplayProps) {
           <p className="text-white font-mono text-sm" role="status">
             No parameters or return values
           </p>
+        )}
+
+        {mode === "interact" && func.type === "function" && (
+          <FunctionInteraction
+            func={func}
+            contractAddress={contractAddress || ""}
+          />
         )}
       </CardContent>
     </Card>

@@ -1,115 +1,144 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AbiSchema, type Abi } from "@/lib/schemas"
-import { AlertCircle, Upload } from "lucide-react"
+import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AbiSchema, type Abi } from "@/lib/schemas";
+import { AlertCircle, Upload } from "lucide-react";
 
 interface AbiInputProps {
-  onAbiParsed: (abi: Abi) => void
+  onAbiParsed: (abi: Abi) => void;
 }
 
 export function AbiInput({ onAbiParsed }: AbiInputProps) {
-  const [abiText, setAbiText] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [abiText, setAbiText] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleParseAbi = async () => {
     if (!abiText.trim()) {
-      setError("Please enter an ABI")
-      return
+      setError("Please enter an ABI");
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const parsed = JSON.parse(abiText)
-      const validatedAbi = AbiSchema.parse(parsed)
-      onAbiParsed(validatedAbi)
+      const parsed = JSON.parse(abiText);
+      const validatedAbi = AbiSchema.parse(parsed);
+      onAbiParsed(validatedAbi);
     } catch (err) {
       if (err instanceof SyntaxError) {
-        setError("Invalid JSON format")
+        setError("Invalid JSON format");
       } else {
-        setError("Invalid ABI format")
+        setError("Invalid ABI format");
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleLoadSample = () => {
     const sampleAbi = `[
   {
-    "type": "function",
+    "constant": true,
+    "inputs": [],
+    "name": "name",
+    "outputs": [{ "name": "", "type": "string" }],
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{ "name": "", "type": "string" }],
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{ "name": "", "type": "uint8" }],
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "_owner", "type": "address" }],
     "name": "balanceOf",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view"
+    "outputs": [{ "name": "balance", "type": "uint256" }],
+    "type": "function"
   },
   {
-    "type": "function",
+    "constant": false,
+    "inputs": [
+      { "name": "_to", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
     "name": "transfer",
-    "inputs": [
-      {
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable"
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "type": "function"
   },
   {
-    "type": "event",
-    "name": "Transfer",
+    "constant": false,
     "inputs": [
-      {
-        "name": "from",
-        "type": "address",
-        "indexed": true
-      },
-      {
-        "name": "to",
-        "type": "address",
-        "indexed": true
-      },
-      {
-        "name": "value",
-        "type": "uint256",
-        "indexed": false
-      }
-    ]
+      { "name": "_spender", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "approve",
+    "outputs": [{ "name": "success", "type": "bool" }],
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "name": "_owner", "type": "address" },
+      { "name": "_spender", "type": "address" }
+    ],
+    "name": "allowance",
+    "outputs": [{ "name": "remaining", "type": "uint256" }],
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "from", "type": "address" },
+      { "indexed": true, "name": "to", "type": "address" },
+      { "indexed": false, "name": "value", "type": "uint256" }
+    ],
+    "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "owner", "type": "address" },
+      { "indexed": true, "name": "spender", "type": "address" },
+      { "indexed": false, "name": "value", "type": "uint256" }
+    ],
+    "name": "Approval",
+    "type": "event"
   }
-]`
-    setAbiText(sampleAbi)
-  }
+]
+`;
+    setAbiText(sampleAbi);
+  };
 
   return (
     <Card className="bg-navy-800 border-navy-600">
       <CardHeader>
-        <CardTitle className="text-white font-mono">Smart Contract ABI</CardTitle>
+        <CardTitle className="text-white font-mono">
+          Smart Contract ABI
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
@@ -157,5 +186,5 @@ export function AbiInput({ onAbiParsed }: AbiInputProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AbiInput } from "./abi-input";
+import { ContractAddressInput } from "./contract-address-input";
 import { FunctionDisplay } from "./function-display";
 import { groupFunctionsByType } from "@/lib/abi-utils";
 import type { Abi } from "@/lib/schemas";
@@ -9,18 +10,67 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useAccount, useConnect, useDisconnect, useChainId } from "wagmi";
+import {
+  mainnet,
+  sepolia,
+  base,
+  arbitrum,
+  optimism,
+  polygon,
+  avalanche,
+} from "wagmi/chains";
+
+// Chain name mapping
+const chainNames: Record<number, string> = {
+  [mainnet.id]: "Ethereum",
+  [sepolia.id]: "Sepolia",
+  [base.id]: "Base",
+  [arbitrum.id]: "Arbitrum",
+  [optimism.id]: "Optimism",
+  [polygon.id]: "Polygon",
+  [avalanche.id]: "Avalanche",
+};
+
+// Chain color mapping for visual distinction
+const getChainColor = (chainId: number): string => {
+  switch (chainId) {
+    case mainnet.id:
+      return "text-blue-400 border-blue-400";
+    case base.id:
+      return "text-cyan-400 border-cyan-400";
+    case arbitrum.id:
+      return "text-blue-500 border-blue-500";
+    case optimism.id:
+      return "text-red-400 border-red-400";
+    case polygon.id:
+      return "text-purple-400 border-purple-400";
+    case avalanche.id:
+      return "text-red-500 border-red-500";
+    default:
+      return "text-gray-400 border-gray-400";
+  }
+};
+
+type Mode = "parse" | "interact";
 
 export function AbiReader() {
+  const [mode, setMode] = useState<Mode>("parse");
   const [parsedAbi, setParsedAbi] = useState<Abi | null>(null);
+  const [contractAddress, setContractAddress] = useState<string>("");
   const [showWalletModal, setShowWalletModal] = useState(false);
 
   const { address, isConnected } = useAccount();
   const { connectors, connect, error: connectError } = useConnect();
   const { disconnect } = useDisconnect();
+  const chainId = useChainId();
 
   const handleAbiParsed = (abi: Abi) => {
     setParsedAbi(abi);
+  };
+
+  const handleAddressSubmitted = (address: string) => {
+    setContractAddress(address);
   };
 
   const handleConnect = async (connector: any) => {
@@ -48,20 +98,49 @@ export function AbiReader() {
             <nav role="navigation" aria-label="Main navigation">
               <ul className="flex items-center gap-8 list-none">
                 <li>
-                  <button className="text-white hover:text-cyan-400 cursor-pointer font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-navy-800 rounded px-2 py-1">
-                    Share
-                  </button>
+                  <Button
+                    variant={mode === "parse" ? "default" : "ghost"}
+                    className={
+                      mode === "parse"
+                        ? "bg-cyan-500 hover:bg-cyan-600 text-navy-900 font-mono"
+                        : "text-white hover:text-cyan-400 font-mono"
+                    }
+                    onClick={() => setMode("parse")}
+                  >
+                    Parse
+                  </Button>
+                </li>
+                <li>
+                  <Button
+                    variant={mode === "interact" ? "default" : "ghost"}
+                    className={
+                      mode === "interact"
+                        ? "bg-cyan-500 hover:bg-cyan-600 text-navy-900 font-mono"
+                        : "text-white hover:text-cyan-400 font-mono"
+                    }
+                    onClick={() => setMode("interact")}
+                  >
+                    Interact
+                  </Button>
                 </li>
               </ul>
             </nav>
 
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <h1 className="text-xl font-mono text-white">
-                Smart Contract ABI Reader
+                📜 Clever Covenant 📜
               </h1>
             </div>
 
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-3">
+              {isConnected && chainId && (
+                <Badge
+                  variant="outline"
+                  className={`bg-navy-700 font-mono ${getChainColor(chainId)}`}
+                >
+                  {chainNames[chainId] || "Unsupported Chain"}
+                </Badge>
+              )}
               {isConnected ? (
                 <Button
                   className="bg-cyan-500 hover:bg-cyan-600 text-navy-900 font-mono font-semibold border border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-navy-800"
@@ -121,10 +200,23 @@ export function AbiReader() {
                 id="intro-heading"
                 className="text-2xl font-mono text-white leading-relaxed"
               >
-                Paste or Upload your Smart Contract ABI to parse and explore!
+                {mode === "parse"
+                  ? "Read your Contract ABI"
+                  : "Interact with a Contract"}
               </p>
             </div>
           </section>
+
+          {mode === "interact" && (
+            <section aria-labelledby="contract-address-section">
+              <h2 id="contract-address-section" className="sr-only">
+                Contract Address Input
+              </h2>
+              <ContractAddressInput
+                onAddressSubmitted={handleAddressSubmitted}
+              />
+            </section>
+          )}
 
           <section aria-labelledby="abi-input-section">
             <h2 id="abi-input-section" className="sr-only">
@@ -138,11 +230,11 @@ export function AbiReader() {
               <Card className="bg-navy-800 border-navy-600">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle
-                      id="parsed-functions-heading"
-                      className="text-white font-mono"
-                    >
-                      Parsed Functions ({parsedAbi.length})
+                    <CardTitle className="text-white font-mono">
+                      {mode === "parse"
+                        ? "Parsed Functions"
+                        : "Contract Functions"}{" "}
+                      ({parsedAbi.length})
                     </CardTitle>
                     <div className="flex gap-2">
                       {functionTypes.map((type) => (
@@ -174,7 +266,16 @@ export function AbiReader() {
                         <TabsContent key={type} value={type} className="mt-6">
                           <div className="grid gap-4">
                             {groupedFunctions[type].map((func, index) => (
-                              <FunctionDisplay key={index} func={func} />
+                              <FunctionDisplay
+                                key={index}
+                                func={func}
+                                mode={mode}
+                                contractAddress={
+                                  mode === "interact"
+                                    ? contractAddress
+                                    : undefined
+                                }
+                              />
                             ))}
                           </div>
                         </TabsContent>
