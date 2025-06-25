@@ -1,5 +1,5 @@
-import { AbiReader } from "@/components/abi-reader"
+import { AbiReader } from "@/components/abi-reader";
 
 export default function Home() {
-  return <AbiReader />
+  return <AbiReader />;
 }

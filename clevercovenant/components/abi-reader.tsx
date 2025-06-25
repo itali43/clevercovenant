@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { AbiInput } from "./abi-input"
-import { FunctionDisplay } from "./function-display"
-import { groupFunctionsByType } from "@/lib/abi-utils"
-import type { Abi } from "@/lib/schemas"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { AbiInput } from "./abi-input";
+import { FunctionDisplay } from "./function-display";
+import { groupFunctionsByType } from "@/lib/abi-utils";
+import type { Abi } from "@/lib/schemas";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 export function AbiReader() {
-  const [parsedAbi, setParsedAbi] = useState<Abi | null>(null)
+  const [parsedAbi, setParsedAbi] = useState<Abi | null>(null);
 
   const handleAbiParsed = (abi: Abi) => {
-    setParsedAbi(abi)
-  }
+    setParsedAbi(abi);
+  };
 
-  const groupedFunctions = parsedAbi ? groupFunctionsByType(parsedAbi) : {}
-  const functionTypes = Object.keys(groupedFunctions)
+  const groupedFunctions = parsedAbi ? groupFunctionsByType(parsedAbi) : {};
+  const functionTypes = Object.keys(groupedFunctions);
 
   return (
     <div className="min-h-screen bg-navy-900">
@@ -31,16 +31,6 @@ export function AbiReader() {
               <ul className="flex items-center gap-8 list-none">
                 <li>
                   <button className="text-white hover:text-cyan-400 cursor-pointer font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-navy-800 rounded px-2 py-1">
-                    Parse
-                  </button>
-                </li>
-                <li>
-                  <button className="text-white hover:text-cyan-400 cursor-pointer font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-navy-800 rounded px-2 py-1">
-                    Interact
-                  </button>
-                </li>
-                <li>
-                  <button className="text-white hover:text-cyan-400 cursor-pointer font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-navy-800 rounded px-2 py-1">
                     Share
                   </button>
                 </li>
@@ -49,7 +39,9 @@ export function AbiReader() {
 
             {/* Centered title */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <h1 className="text-xl font-mono text-white">Smart Contract ABI Reader</h1>
+              <h1 className="text-xl font-mono text-white">
+                Smart Contract ABI Reader
+              </h1>
             </div>
 
             {/* Right side - Connect Wallet button */}
@@ -69,7 +61,10 @@ export function AbiReader() {
         <div className="max-w-6xl mx-auto space-y-8">
           <section aria-labelledby="intro-heading">
             <div className="text-center mb-8">
-              <p id="intro-heading" className="text-2xl font-mono text-white leading-relaxed">
+              <p
+                id="intro-heading"
+                className="text-2xl font-mono text-white leading-relaxed"
+              >
                 Paste or Upload your Smart Contract ABI to parse and explore!
               </p>
             </div>
@@ -87,10 +82,17 @@ export function AbiReader() {
               <Card className="bg-navy-800 border-navy-600">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle id="parsed-functions-heading" className="text-white font-mono">
+                    <CardTitle
+                      id="parsed-functions-heading"
+                      className="text-white font-mono"
+                    >
                       Parsed Functions ({parsedAbi.length})
                     </CardTitle>
-                    <div className="flex gap-2" role="group" aria-label="Function type summary">
+                    <div
+                      className="flex gap-2"
+                      role="group"
+                      aria-label="Function type summary"
+                    >
                       {functionTypes.map((type) => (
                         <Badge
                           key={type}
@@ -123,7 +125,11 @@ export function AbiReader() {
                       </TabsList>
                       {functionTypes.map((type) => (
                         <TabsContent key={type} value={type} className="mt-6">
-                          <div className="grid gap-4" role="list" aria-label={`${type} functions`}>
+                          <div
+                            className="grid gap-4"
+                            role="list"
+                            aria-label={`${type} functions`}
+                          >
                             {groupedFunctions[type].map((func, index) => (
                               <div key={index} role="listitem">
                                 <FunctionDisplay func={func} />
@@ -134,7 +140,10 @@ export function AbiReader() {
                       ))}
                     </Tabs>
                   ) : (
-                    <div className="text-center py-8 text-white font-mono" role="status">
+                    <div
+                      className="text-center py-8 text-white font-mono"
+                      role="status"
+                    >
                       No functions found in the ABI
                     </div>
                   )}
@@ -145,5 +154,5 @@ export function AbiReader() {
         </div>
       </main>
     </div>
-  )
+  );
 }
