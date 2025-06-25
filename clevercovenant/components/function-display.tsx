@@ -1,44 +1,52 @@
-import type { AbiFunction } from "@/lib/schemas"
-import { formatType, getStateMutabilityColor, getFunctionTypeColor } from "@/lib/abi-utils"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+"use client";
+
+import type { AbiFunction } from "@/lib/schemas";
+import {
+  formatType,
+  getStateMutabilityColor,
+  getFunctionTypeColor,
+} from "@/lib/abi-utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface FunctionDisplayProps {
-  func: AbiFunction
+  func: AbiFunction;
 }
 
 const getStateMutabilityLabel = (stateMutability?: string): string => {
   switch (stateMutability) {
     case "pure":
-      return "Pure function - does not read or modify state"
+      return "Pure function - does not read or modify state";
     case "view":
-      return "View function - reads state but does not modify"
+      return "View function - reads state but does not modify";
     case "nonpayable":
-      return "Non-payable function - modifies state but cannot receive Ether"
+      return "Non-payable function - modifies state but cannot receive Ether";
     case "payable":
-      return "Payable function - can receive Ether"
+      return "Payable function - can receive Ether";
     default:
-      return "Unknown state mutability"
+      return "Unknown state mutability";
   }
-}
+};
 
 const getFunctionTypeLabel = (type: string): string => {
   switch (type) {
     case "function":
-      return "Contract function"
+      return "Contract function";
     case "constructor":
-      return "Contract constructor"
+      return "Contract constructor";
     case "event":
-      return "Contract event"
+      return "Contract event";
     case "error":
-      return "Contract error"
+      return "Contract error";
     default:
-      return `Contract ${type}`
+      return `Contract ${type}`;
   }
-}
+};
 
 export function FunctionDisplay({ func }: FunctionDisplayProps) {
-  const functionId = `function-${func.name || func.type}-${Math.random().toString(36).substr(2, 9)}`
+  const functionId = `function-${func.name || func.type}-${Math.random()
+    .toString(36)
+    .substr(2, 9)}`;
 
   return (
     <Card
@@ -48,19 +56,30 @@ export function FunctionDisplay({ func }: FunctionDisplayProps) {
     >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle id={`${functionId}-title`} className="text-lg font-mono text-white">
+          <CardTitle
+            id={`${functionId}-title`}
+            className="text-lg font-mono text-white"
+          >
             {func.name || func.type}
           </CardTitle>
-          <div className="flex gap-2" role="group" aria-label="Function metadata">
+          <div
+            className="flex gap-2"
+            role="group"
+            aria-label="Function metadata"
+          >
             <Badge
-              className={`${getFunctionTypeColor(func.type)} bg-navy-700 border-current font-mono`}
+              className={`${getFunctionTypeColor(
+                func.type
+              )} bg-navy-700 border-current font-mono`}
               aria-label={getFunctionTypeLabel(func.type)}
             >
               {func.type}
             </Badge>
             {func.stateMutability && (
               <Badge
-                className={`${getStateMutabilityColor(func.stateMutability)} bg-navy-700 border-current font-mono`}
+                className={`${getStateMutabilityColor(
+                  func.stateMutability
+                )} bg-navy-700 border-current font-mono`}
                 aria-label={getStateMutabilityLabel(func.stateMutability)}
               >
                 {func.stateMutability}
@@ -72,17 +91,30 @@ export function FunctionDisplay({ func }: FunctionDisplayProps) {
       <CardContent className="space-y-4">
         {func.inputs.length > 0 && (
           <section aria-labelledby={`${functionId}-inputs`}>
-            <h4 id={`${functionId}-inputs`} className="text-sm font-semibold text-cyan-400 mb-2 font-mono">
+            <h4
+              id={`${functionId}-inputs`}
+              className="text-sm font-semibold text-cyan-400 mb-2 font-mono"
+            >
               Inputs ({func.inputs.length})
             </h4>
             <ul className="space-y-1 list-none" role="list">
               {func.inputs.map((input, index) => (
-                <li key={index} className="flex items-center gap-2 text-sm font-mono" role="listitem">
-                  <span className="text-cyan-300" aria-label={`Parameter type: ${formatType(input)}`}>
+                <li
+                  key={index}
+                  className="flex items-center gap-2 text-sm font-mono"
+                  role="listitem"
+                >
+                  <span
+                    className="text-cyan-300"
+                    aria-label={`Parameter type: ${formatType(input)}`}
+                  >
                     {formatType(input)}
                   </span>
                   {input.name && (
-                    <span className="text-white" aria-label={`Parameter name: ${input.name}`}>
+                    <span
+                      className="text-white"
+                      aria-label={`Parameter name: ${input.name}`}
+                    >
                       {input.name}
                     </span>
                   )}
@@ -102,17 +134,30 @@ export function FunctionDisplay({ func }: FunctionDisplayProps) {
 
         {func.outputs.length > 0 && (
           <section aria-labelledby={`${functionId}-outputs`}>
-            <h4 id={`${functionId}-outputs`} className="text-sm font-semibold text-cyan-400 mb-2 font-mono">
+            <h4
+              id={`${functionId}-outputs`}
+              className="text-sm font-semibold text-cyan-400 mb-2 font-mono"
+            >
               Outputs ({func.outputs.length})
             </h4>
             <ul className="space-y-1 list-none" role="list">
               {func.outputs.map((output, index) => (
-                <li key={index} className="flex items-center gap-2 text-sm font-mono" role="listitem">
-                  <span className="text-cyan-300" aria-label={`Return type: ${formatType(output)}`}>
+                <li
+                  key={index}
+                  className="flex items-center gap-2 text-sm font-mono"
+                  role="listitem"
+                >
+                  <span
+                    className="text-cyan-300"
+                    aria-label={`Return type: ${formatType(output)}`}
+                  >
                     {formatType(output)}
                   </span>
                   {output.name && (
-                    <span className="text-white" aria-label={`Return value name: ${output.name}`}>
+                    <span
+                      className="text-white"
+                      aria-label={`Return value name: ${output.name}`}
+                    >
                       {output.name}
                     </span>
                   )}
@@ -129,5 +174,5 @@ export function FunctionDisplay({ func }: FunctionDisplayProps) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
