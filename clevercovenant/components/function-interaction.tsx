@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { AbiFunction, AbiInput } from "@/lib/schemas";
+import type { AbiFunction } from "@/lib/schemas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -11,7 +11,7 @@ import {
   useWaitForTransactionReceipt,
   useReadContract,
 } from "wagmi";
-import { parseAbiParameter } from "viem";
+import { formatInput } from "@/lib/contract-utils";
 
 interface FunctionInteractionProps {
   func: AbiFunction;
@@ -72,27 +72,6 @@ export function FunctionInteraction({
   const handleInputChange = (name: string, value: string) => {
     setInputs((prev) => ({ ...prev, [name]: value }));
     setError(null);
-  };
-
-  const formatInput = (input: AbiInput, value: string) => {
-    if (!value) return undefined;
-
-    try {
-      // Handle common Ethereum types
-      if (input.type === "address") return value;
-      if (input.type === "uint256" || input.type === "int256")
-        return BigInt(value);
-      if (input.type === "bool") return value.toLowerCase() === "true";
-      if (input.type.startsWith("bytes")) return value as `0x${string}`;
-      if (input.type === "string") return value;
-      if (input.type.includes("[]")) return JSON.parse(value); // Array inputs
-
-      // For other types, try to parse as ABI parameter
-      return parseAbiParameter(input.type);
-    } catch (err) {
-      console.error(`Error formatting input for ${input.type}:`, err);
-      return value;
-    }
   };
 
   const handleExecute = async () => {
